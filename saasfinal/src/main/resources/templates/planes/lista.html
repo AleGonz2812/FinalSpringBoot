@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes Disponibles - SaaS Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .plan-card {
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .plan-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .plan-basic {
+            border-color: #3498db;
+        }
+        .plan-premium {
+            border-color: #9b59b6;
+            background: linear-gradient(135deg, #f5f7fa 0%, #f8f9ff 100%);
+        }
+        .plan-enterprise {
+            border-color: #f39c12;
+        }
+        .price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .badge-feature {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 5px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">🚀 SaaS Platform</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/planes">Planes</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-primary text-white py-5 text-center">
+        <div class="container">
+            <h1 class="display-4 fw-bold">Elige el Plan Perfecto para Ti</h1>
+            <p class="lead">Todos los planes incluyen facturación automática cada 30 días</p>
+        </div>
+    </div>
+
+    <!-- Plans Section -->
+    <div class="container my-5">
+        <div class="row g-4">
+            <!-- Verificar si hay planes -->
+            <div th:if="${planes.empty}" class="col-12">
+                <div class="alert alert-warning text-center" role="alert">
+                    <h4>⚠️ No hay planes disponibles</h4>
+                    <p>Los planes se inicializarán automáticamente al arrancar la aplicación.</p>
+                </div>
+            </div>
+
+            <!-- Iterar sobre los planes -->
+            <div th:each="plan : ${planes}" class="col-md-4">
+                <div class="card plan-card h-100"
+                     th:classappend="${plan.tipo.name() == 'BASIC'} ? 'plan-basic' : 
+                                    (${plan.tipo.name() == 'PREMIUM'} ? 'plan-premium' : 'plan-enterprise')">
+                    <div class="card-header text-center py-4"
+                         th:classappend="${plan.tipo.name() == 'BASIC'} ? 'bg-primary text-white' : 
+                                        (${plan.tipo.name() == 'PREMIUM'} ? 'bg-purple text-white' : 'bg-warning text-dark')">
+                        <h3 class="mb-0" th:text="${plan.tipo.nombre}">Plan Name</h3>
+                        <div th:if="${plan.tipo.name() == 'PREMIUM'}" class="badge bg-light text-primary mt-2">
+                            ⭐ Más Popular
+                        </div>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="price mb-4">
+                            $<span th:text="${#numbers.formatDecimal(plan.precio, 1, 2)}">0.00</span>
+                            <small class="fs-6 text-muted">/mes</small>
+                        </div>
+                        
+                        <p class="text-muted mb-4" th:text="${plan.descripcion}">Descripción del plan</p>
+                        
+                        <hr>
+                        
+                        <div class="text-start mb-4">
+                            <p class="mb-2">
+                                <strong>👥 Usuarios:</strong>
+                                <span th:if="${plan.maxUsuarios == -1}">Ilimitados</span>
+                                <span th:unless="${plan.maxUsuarios == -1}" th:text="${plan.maxUsuarios}">0</span>
+                            </p>
+                            <p class="mb-2">
+                                <strong>💾 Almacenamiento:</strong>
+                                <span th:text="${plan.almacenamientoGb} + ' GB'">0 GB</span>
+                            </p>
+                            <p class="mb-2">
+                                <strong>🎯 Soporte:</strong>
+                                <span th:if="${plan.soportePrioritario}">
+                                    <span class="badge bg-success">Prioritario</span>
+                                </span>
+                                <span th:unless="${plan.soportePrioritario}">
+                                    <span class="badge bg-secondary">Estándar</span>
+                                </span>
+                            </p>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button class="btn btn-lg" 
+                                    th:classappend="${plan.tipo.name() == 'BASIC'} ? 'btn-primary' : 
+                                                   (${plan.tipo.name() == 'PREMIUM'} ? 'btn-purple' : 'btn-warning')">
+                                Seleccionar Plan
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center text-muted">
+                        <small>✅ Cancelación en cualquier momento</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información adicional -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="alert alert-info" role="alert">
+                    <h5 class="alert-heading">ℹ️ Información sobre los Planes</h5>
+                    <hr>
+                    <ul class="mb-0">
+                        <li>✅ Las facturas se generan automáticamente cada 30 días</li>
+                        <li>✅ Puedes cambiar de plan en cualquier momento</li>
+                        <li>✅ Si cambias a un plan más caro, se aplicará un prorrateo</li>
+                        <li>✅ Todos los cambios son auditados con Hibernate Envers</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">© 2026 SaaS Platform - Proyecto Final Spring Boot</p>
+            <small class="text-muted">Semana 1: Validación de Planes ✅</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
