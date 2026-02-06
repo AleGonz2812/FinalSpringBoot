@@ -1,4 +1,4 @@
-package com.example.saasfinal.model.entity;
+    package com.example.saasfinal.model.entity;
 
 import com.example.saasfinal.model.enums.EstadoFactura;
 import jakarta.persistence.*;

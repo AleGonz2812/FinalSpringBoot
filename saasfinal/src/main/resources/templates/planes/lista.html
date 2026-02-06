@@ -6,44 +6,106 @@
     <title>Planes Disponibles - SaaS Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #121212;
+            color: #FFFFFF;
+        }
+        .navbar-spotify {
+            background-color: #191414 !important;
+            border-bottom: 1px solid #282828;
+        }
+        .navbar-brand {
+            color: #1DB954 !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            color: #B3B3B3 !important;
+            transition: color 0.2s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #FFFFFF !important;
+        }
+        .header-section {
+            background: linear-gradient(180deg, #191414 0%, #1DB954 100%);
+            padding: 60px 0;
+        }
         .plan-card {
+            background-color: #282828;
+            border: 2px solid #282828;
             transition: all 0.3s;
-            border: 2px solid transparent;
+            border-radius: 8px;
         }
         .plan-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .plan-basic {
-            border-color: #3498db;
+            border-color: #1DB954;
+            box-shadow: 0 10px 30px rgba(29, 185, 84, 0.3);
         }
         .plan-premium {
-            border-color: #9b59b6;
-            background: linear-gradient(135deg, #f5f7fa 0%, #f8f9ff 100%);
-        }
-        .plan-enterprise {
-            border-color: #f39c12;
+            border-color: #1DB954;
+            box-shadow: 0 4px 20px rgba(29, 185, 84, 0.2);
         }
         .price {
             font-size: 3rem;
             font-weight: bold;
-            color: #2c3e50;
+            color: #1DB954;
         }
-        .badge-feature {
-            background-color: #e8f5e9;
-            color: #2e7d32;
-            padding: 8px 15px;
-            border-radius: 20px;
-            margin: 5px;
-            display: inline-block;
+        .btn-spotify {
+            background-color: #1DB954;
+            color: #000000;
+            font-weight: 700;
+            border: none;
+            border-radius: 500px;
+            transition: all 0.3s;
+        }
+        .btn-spotify:hover {
+            background-color: #1ed760;
+            transform: scale(1.04);
+            color: #000000;
+        }
+        .card-header-spotify {
+            background-color: #191414;
+            border-bottom: 2px solid #1DB954;
+        }
+        .card-header-spotify h3 {
+            color: #FFFFFF !important;
+        }
+        .plan-card .card-body {
+            color: #FFFFFF;
+        }
+        .plan-card .card-body p {
+            color: #FFFFFF;
+        }
+        .plan-card .card-body strong {
+            color: #FFFFFF;
+        }
+        .badge-popular {
+            background-color: #1DB954;
+            color: #000000;
+            font-weight: 700;
+        }
+        .text-spotify-gray {
+            color: #B3B3B3;
+        }
+        footer {
+            background-color: #000000;
+            border-top: 1px solid #282828;
+        }
+        .info-box {
+            background-color: #282828;
+            border-left: 4px solid #1DB954;
+            border-radius: 4px;
+        }
+        .info-box h4, .info-box h5 {
+            color: #FFFFFF;
         }
     </style>
 </head>
 <body>
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-spotify">
         <div class="container">
-            <a class="navbar-brand" href="/">🚀 SaaS Platform</a>
+            <a class="navbar-brand" href="/">SaaS Platform</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -61,7 +123,7 @@
     </nav>
 
     <!-- Header -->
-    <div class="bg-primary text-white py-5 text-center">
+    <div class="header-section text-center">
         <div class="container">
             <h1 class="display-4 fw-bold">Elige el Plan Perfecto para Ti</h1>
             <p class="lead">Todos los planes incluyen facturación automática cada 30 días</p>
@@ -73,47 +135,44 @@
         <div class="row g-4">
             <!-- Verificar si hay planes -->
             <div th:if="${planes.empty}" class="col-12">
-                <div class="alert alert-warning text-center" role="alert">
-                    <h4>⚠️ No hay planes disponibles</h4>
-                    <p>Los planes se inicializarán automáticamente al arrancar la aplicación.</p>
+                <div class="alert info-box text-center p-4" role="alert">
+                    <h4>No hay planes disponibles</h4>
+                    <p class="mb-0">Los planes se inicializarán automáticamente al arrancar la aplicación.</p>
                 </div>
             </div>
 
             <!-- Iterar sobre los planes -->
             <div th:each="plan : ${planes}" class="col-md-4">
                 <div class="card plan-card h-100"
-                     th:classappend="${plan.tipo.name() == 'BASIC'} ? 'plan-basic' : 
-                                    (${plan.tipo.name() == 'PREMIUM'} ? 'plan-premium' : 'plan-enterprise')">
-                    <div class="card-header text-center py-4"
-                         th:classappend="${plan.tipo.name() == 'BASIC'} ? 'bg-primary text-white' : 
-                                        (${plan.tipo.name() == 'PREMIUM'} ? 'bg-purple text-white' : 'bg-warning text-dark')">
+                     th:classappend="${plan.tipo.name() == 'PREMIUM'} ? 'plan-premium' : ''">
+                    <div class="card-header card-header-spotify text-center py-4">
                         <h3 class="mb-0" th:text="${plan.tipo.nombre}">Plan Name</h3>
-                        <div th:if="${plan.tipo.name() == 'PREMIUM'}" class="badge bg-light text-primary mt-2">
-                            ⭐ Más Popular
+                        <div th:if="${plan.tipo.name() == 'PREMIUM'}" class="badge badge-popular mt-2">
+                            Más Popular
                         </div>
                     </div>
                     <div class="card-body text-center">
                         <div class="price mb-4">
                             $<span th:text="${#numbers.formatDecimal(plan.precio, 1, 2)}">0.00</span>
-                            <small class="fs-6 text-muted">/mes</small>
+                            <small class="fs-6 text-spotify-gray">/mes</small>
                         </div>
                         
-                        <p class="text-muted mb-4" th:text="${plan.descripcion}">Descripción del plan</p>
+                        <p class="text-spotify-gray mb-4" th:text="${plan.descripcion}">Descripción del plan</p>
                         
-                        <hr>
+                        <hr style="border-color: #404040;">
                         
                         <div class="text-start mb-4">
                             <p class="mb-2">
-                                <strong>👥 Usuarios:</strong>
+                                <strong>Usuarios:</strong>
                                 <span th:if="${plan.maxUsuarios == -1}">Ilimitados</span>
                                 <span th:unless="${plan.maxUsuarios == -1}" th:text="${plan.maxUsuarios}">0</span>
                             </p>
                             <p class="mb-2">
-                                <strong>💾 Almacenamiento:</strong>
+                                <strong>Almacenamiento:</strong>
                                 <span th:text="${plan.almacenamientoGb} + ' GB'">0 GB</span>
                             </p>
                             <p class="mb-2">
-                                <strong>🎯 Soporte:</strong>
+                                <strong>Soporte:</strong>
                                 <span th:if="${plan.soportePrioritario}">
                                     <span class="badge bg-success">Prioritario</span>
                                 </span>
@@ -124,15 +183,13 @@
                         </div>
                         
                         <div class="d-grid">
-                            <button class="btn btn-lg" 
-                                    th:classappend="${plan.tipo.name() == 'BASIC'} ? 'btn-primary' : 
-                                                   (${plan.tipo.name() == 'PREMIUM'} ? 'btn-purple' : 'btn-warning')">
+                            <button class="btn btn-lg btn-spotify">
                                 Seleccionar Plan
                             </button>
                         </div>
                     </div>
-                    <div class="card-footer text-center text-muted">
-                        <small>✅ Cancelación en cualquier momento</small>
+                    <div class="card-footer text-center" style="background-color: #191414; border-top: 1px solid #404040;">
+                        <small class="text-spotify-gray">Cancelación en cualquier momento</small>
                     </div>
                 </div>
             </div>
@@ -141,14 +198,14 @@
         <!-- Información adicional -->
         <div class="row mt-5">
             <div class="col-12">
-                <div class="alert alert-info" role="alert">
-                    <h5 class="alert-heading">ℹ️ Información sobre los Planes</h5>
-                    <hr>
-                    <ul class="mb-0">
-                        <li>✅ Las facturas se generan automáticamente cada 30 días</li>
-                        <li>✅ Puedes cambiar de plan en cualquier momento</li>
-                        <li>✅ Si cambias a un plan más caro, se aplicará un prorrateo</li>
-                        <li>✅ Todos los cambios son auditados con Hibernate Envers</li>
+                <div class="info-box p-4" role="alert">
+                    <h5 class="mb-3">Información sobre los Planes</h5>
+                    <hr style="border-color: #404040;">
+                    <ul class="mb-0 text-spotify-gray">
+                        <li>Las facturas se generan automáticamente cada 30 días</li>
+                        <li>Puedes cambiar de plan en cualquier momento</li>
+                        <li>Si cambias a un plan más caro, se aplicará un prorrateo</li>
+                        <li>Todos los cambios son auditados con Hibernate Envers</li>
                     </ul>
                 </div>
             </div>
@@ -156,10 +213,10 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-4 mt-5">
+    <footer class="text-center py-4 mt-5">
         <div class="container">
             <p class="mb-0">© 2026 SaaS Platform - Proyecto Final Spring Boot</p>
-            <small class="text-muted">Semana 1: Validación de Planes ✅</small>
+            <small class="text-spotify-gray">Semana 1: Validación de Planes</small>
         </div>
     </footer>
 
