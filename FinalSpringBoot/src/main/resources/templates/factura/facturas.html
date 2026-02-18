@@ -1,34 +1,34 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Facturas - Admin Panel</title>
+    <title>Mis Facturas - SaaS Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Admin Panel</a>
+            <a class="navbar-brand" href="#">SaaS Platform</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin}">Dashboard</a>
+                        <a class="nav-link" th:href="@{/dashboard}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/usuarios}">Usuarios</a>
+                        <a class="nav-link" th:href="@{/dashboard/perfil}">Perfil</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/suscripciones}">Suscripciones</a>
+                        <a class="nav-link" th:href="@{/suscripcion/planes}">Planes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/admin/facturas}">Facturas</a>
+                        <a class="nav-link active" th:href="@{/facturas}">Facturas</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/dashboard}">Volver a Usuario</a>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" th:href="@{/admin}">Admin</a>
                     </li>
                     <li class="nav-item">
                         <form th:action="@{/logout}" method="post" class="d-inline">
@@ -40,49 +40,43 @@
         </div>
     </nav>
 
-    <div class="container-fluid mt-4">
-        <h1>Gestión de Facturas</h1>
+    <div class="container mt-4">
+        <h1>Mis Facturas</h1>
+        
+        <div th:if="${totalFacturado != null}" class="alert alert-info mt-3">
+            <strong>Total Facturado:</strong> <span th:text="${totalFacturado} + '€'"></span>
+        </div>
         
         <div class="card mt-4">
             <div class="card-body">
                 <div th:if="${facturas != null and !facturas.empty}">
                     <div class="table-responsive">
-                        <table class="table table-striped table-sm">
+                        <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Usuario</th>
+                                    <th>N° Factura</th>
+                                    <th>Fecha</th>
                                     <th>Plan</th>
-                                    <th>Fecha Emisión</th>
                                     <th>Monto Bruto</th>
                                     <th>Impuesto</th>
-                                    <th>Monto Total</th>
-                                    <th>País</th>
+                                    <th>Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="factura : ${facturas}">
                                     <td th:text="${factura.id}"></td>
-                                    <td th:text="${factura.suscripcion.usuario.username}"></td>
-                                    <td th:text="${factura.suscripcion.plan.nombre}"></td>
                                     <td th:text="${#temporals.format(factura.fechaEmision, 'dd/MM/yyyy HH:mm')}"></td>
+                                    <td th:text="${factura.suscripcion.plan.nombre}"></td>
                                     <td th:text="${factura.montoBruto} + '€'"></td>
                                     <td th:text="${factura.impuesto} + '€'"></td>
                                     <td><strong th:text="${factura.montoTotal} + '€'"></strong></td>
-                                    <td th:text="${factura.suscripcion.usuario.perfil.pais}"></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    
-                    <!-- Resumen de Ingresos -->
-                    <div class="alert alert-info mt-3">
-                        <strong>Total de Ingresos:</strong> 
-                        <span th:text="${#aggregates.sum(facturas.![montoTotal])} + '€'"></span>
-                    </div>
                 </div>
                 <div th:unless="${facturas != null and !facturas.empty}">
-                    <p class="text-center text-muted">No hay facturas registradas.</p>
+                    <p class="text-center text-muted">No tienes facturas aún.</p>
                 </div>
             </div>
         </div>

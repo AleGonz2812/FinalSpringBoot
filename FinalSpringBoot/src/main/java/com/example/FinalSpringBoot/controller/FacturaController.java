@@ -32,7 +32,7 @@ public class FacturaController {
         model.addAttribute("facturas", facturaService.obtenerFacturasPorUsuario(usuario.getId()));
         model.addAttribute("totalFacturado", facturaService.calcularTotalFacturadoUsuario(usuario.getId()));
         
-        return "facturas";
+        return "factura/facturas";
     }
 
     
@@ -61,6 +61,6 @@ public class FacturaController {
         }
         
         model.addAttribute("totalFacturado", facturaService.calcularTotalFacturadoUsuario(usuario.getId()));
-        return "facturas";
+        return "factura/facturas";
     }
 }

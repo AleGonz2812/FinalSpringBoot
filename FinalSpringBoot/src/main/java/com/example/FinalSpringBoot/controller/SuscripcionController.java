@@ -37,7 +37,7 @@ public class SuscripcionController {
         model.addAttribute("planes", planService.obtenerTodosLosPlanes());
         model.addAttribute("suscripcionActiva", suscripcionActiva.orElse(null));
         
-        return "planes";
+        return "suscripcion/planes";
     }
 
     

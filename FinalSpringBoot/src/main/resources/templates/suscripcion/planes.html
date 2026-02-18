@@ -50,8 +50,8 @@
             <div class="col-md-4" th:each="plan : ${planes}">
                 <div class="card mb-4">
                     <div class="card-header text-center" 
-                         th:classappend="${plan.nombre.name() == 'BASIC'} ? 'bg-secondary text-white' : 
-                             ${plan.nombre.name() == 'PREMIUM'} ? 'bg-primary text-white' : 'bg-warning'">
+                         th:classappend="${plan.nombre.name() == 'BASIC' ? 'bg-secondary text-white' : 
+                             plan.nombre.name() == 'PREMIUM' ? 'bg-primary text-white' : 'bg-warning'}">
                         <h3 th:text="${plan.nombre}"></h3>
                     </div>
                     <div class="card-body text-center">
