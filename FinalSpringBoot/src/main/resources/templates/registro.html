@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro - SaaS Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/toast.css}" rel="stylesheet">
 </head>
 <body class="bg-light">
     <div class="container">
@@ -16,11 +17,12 @@
                         
                         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
                         
-                        <form th:action="@{/auth/registrar}" method="post">
+                        <form th:action="@{/auth/registrar}" method="post" id="registroForm">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label for="username" class="form-label">Usuario *</label>
                                     <input type="text" class="form-control" id="username" name="username" required>
+                                    <small class="text-muted">3-20 caracteres, solo letras, números y guión bajo</small>
                                 </div>
                                 
                                 <div class="col-md-6 mb-3">
@@ -33,6 +35,7 @@
                                 <div class="col-md-6 mb-3">
                                     <label for="password" class="form-label">Contraseña *</label>
                                     <input type="password" class="form-control" id="password" name="password" required>
+                                    <small class="text-muted">Mín. 8 caracteres, 1 mayúscula, 1 minúscula, 1 número</small>
                                 </div>
                                 
                                 <div class="col-md-6 mb-3">
@@ -78,5 +81,73 @@
             </div>
         </div>
     </div>
+    
+    <script th:src="@{/js/utils.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registroForm');
+            const usernameInput = document.getElementById('username');
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            // Validación en tiempo real para username
+            usernameInput.addEventListener('blur', function() {
+                const result = Validators.username(this.value);
+                if (!result.valid) {
+                    showFieldError(this, result.message);
+                } else {
+                    showFieldSuccess(this);
+                }
+            });
+            
+            // Validación en tiempo real para email
+            emailInput.addEventListener('blur', function() {
+                if (!Validators.email(this.value)) {
+                    showFieldError(this, 'Email inválido');
+                } else {
+                    showFieldSuccess(this);
+                }
+            });
+            
+            // Validación en tiempo real para password
+            passwordInput.addEventListener('input', function() {
+                const result = Validators.password(this.value);
+                if (!result.valid) {
+                    showFieldError(this, result.message);
+                } else {
+                    showFieldSuccess(this);
+                }
+            });
+            
+            // Validación al enviar formulario
+            form.addEventListener('submit', function(e) {
+                let valid = true;
+                
+                const usernameResult = Validators.username(usernameInput.value);
+                if (!usernameResult.valid) {
+                    showFieldError(usernameInput, usernameResult.message);
+                    valid = false;
+                }
+                
+                if (!Validators.email(emailInput.value)) {
+                    showFieldError(emailInput, 'Email inválido');
+                    valid = false;
+                }
+                
+                const passwordResult = Validators.password(passwordInput.value);
+                if (!passwordResult.valid) {
+                    showFieldError(passwordInput, passwordResult.message);
+                    valid = false;
+                }
+                
+                if (!valid) {
+                    e.preventDefault();
+                    Toast.error('Por favor, corrige los errores en el formulario');
+                } else {
+                    Spinner.show();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

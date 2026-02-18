@@ -184,4 +184,37 @@ public class SuscripcionService {
         suscripcion.setEstado(EstadoSuscripcion.MOROSA);
         return suscripcionRepository.save(suscripcion);
     }
+
+    /**
+     * Reactivar una suscripción morosa (admin simula que se solucionó el problema de pago)
+     */
+    @Transactional
+    @SuppressWarnings("null")
+    public Suscripcion reactivarSuscripcion(Long suscripcionId) {
+        Suscripcion suscripcion = suscripcionRepository.findById(suscripcionId)
+                .orElseThrow(() -> new RuntimeException("Suscripción no encontrada"));
+
+        if (suscripcion.getEstado() != EstadoSuscripcion.MOROSA) {
+            throw new RuntimeException("Solo se pueden reactivar suscripciones morosas");
+        }
+
+        suscripcion.setEstado(EstadoSuscripcion.ACTIVA);
+        return suscripcionRepository.save(suscripcion);
+    }
+
+    /**
+     * Eliminar una suscripción permanentemente (solo para canceladas/historial)
+     */
+    @Transactional
+    @SuppressWarnings("null")
+    public void eliminarSuscripcion(Long suscripcionId) {
+        Suscripcion suscripcion = suscripcionRepository.findById(suscripcionId)
+                .orElseThrow(() -> new RuntimeException("Suscripción no encontrada"));
+
+        if (suscripcion.getEstado() == EstadoSuscripcion.ACTIVA) {
+            throw new RuntimeException("No se puede eliminar una suscripción activa. Cancélala primero.");
+        }
+
+        suscripcionRepository.delete(suscripcion);
+    }
 }

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - SaaS Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/toast.css}" rel="stylesheet">
     <style>
         .card {
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -95,8 +96,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Herramientas de Administración</h5>
                         <p>Ejecutar manualmente el proceso de renovación de suscripciones:</p>
-                        <form th:action="@{/admin/renovar-forzado}" method="post" 
-                              onsubmit="return confirm('¿Estás seguro de ejecutar la renovación forzada de todas las suscripciones?');">
+                        <form th:action="@{/admin/renovar-forzado}" method="post" id="formRenovacion">
                             <button type="submit" class="btn btn-warning">
                                 Ejecutar Renovación Forzada
                             </button>
@@ -107,6 +107,24 @@
         </div>
     </div>
     
+    <script th:src="@{/js/utils.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formRenovacion = document.getElementById('formRenovacion');
+            if (formRenovacion) {
+                formRenovacion.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const confirmed = await confirmAction(
+                        '¿Estás seguro de ejecutar la renovación forzada de todas las suscripciones?'
+                    );
+                    if (confirmed) {
+                        Spinner.show();
+                        this.submit();
+                    }
+                });
+            }
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

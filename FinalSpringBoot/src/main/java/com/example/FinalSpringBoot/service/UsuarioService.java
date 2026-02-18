@@ -104,6 +104,12 @@ public class UsuarioService {
     public void eliminarUsuario(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        
+        // Protección: No permitir eliminar usuarios con rol ADMIN
+        if (usuario.getRol() == Rol.ADMIN) {
+            throw new RuntimeException("No se puede eliminar un usuario administrador");
+        }
+        
         usuarioRepository.delete(usuario);
     }
 

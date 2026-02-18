@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Suscripciones - Admin Panel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/toast.css}" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -34,6 +35,16 @@
             <a th:href="@{/admin}" class="btn btn-primary">← Volver al Panel</a>
         </div>
         
+        <!-- Mensajes flash -->
+        <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
         <div class="card mt-4">
             <div class="card-body">
                 <div th:if="${suscripciones != null and !suscripciones.empty}">
@@ -49,6 +60,7 @@
                                     <th>Fecha Inicio</th>
                                     <th>Fecha Fin</th>
                                     <th>País</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,6 +77,39 @@
                                     <td th:text="${#temporals.format(suscripcion.fechaInicio, 'dd/MM/yyyy')}"></td>
                                     <td th:text="${#temporals.format(suscripcion.fechaFin, 'dd/MM/yyyy')}"></td>
                                     <td th:text="${suscripcion.usuario.perfil != null ? suscripcion.usuario.perfil.pais : '-'}"></td>
+                                    <td>
+                                        <!-- Botones para ACTIVA -->
+                                        <div th:if="${suscripcion.estado.name() == 'ACTIVA'}">
+                                            <form th:action="@{/admin/suscripciones/{id}/cancelar(id=${suscripcion.id})}" method="post" class="d-inline form-cancelar-suscripcion"
+                                                  th:data-suscripcion-id="${suscripcion.id}" th:data-usuario="${suscripcion.usuario.username}">
+                                                <input type="hidden" name="estado" th:value="${param.estado != null ? param.estado[0] : ''}" />
+                                                <button type="submit" class="btn btn-sm btn-warning">Cancelar</button>
+                                            </form>
+                                        </div>
+                                        
+                                        <!-- Botones para CANCELADA -->
+                                        <div th:if="${suscripcion.estado.name() == 'CANCELADA'}">
+                                            <form th:action="@{/admin/suscripciones/{id}/eliminar(id=${suscripcion.id})}" method="post" class="d-inline form-eliminar-suscripcion"
+                                                  th:data-suscripcion-id="${suscripcion.id}" th:data-usuario="${suscripcion.usuario.username}">
+                                                <input type="hidden" name="estado" th:value="${param.estado != null ? param.estado[0] : ''}" />
+                                                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                                            </form>
+                                        </div>
+                                        
+                                        <!-- Botones para MOROSA -->
+                                        <div th:if="${suscripcion.estado.name() == 'MOROSA'}">
+                                            <form th:action="@{/admin/suscripciones/{id}/reactivar(id=${suscripcion.id})}" method="post" class="d-inline form-reactivar-suscripcion"
+                                                  th:data-suscripcion-id="${suscripcion.id}" th:data-usuario="${suscripcion.usuario.username}">
+                                                <input type="hidden" name="estado" th:value="${param.estado != null ? param.estado[0] : ''}" />
+                                                <button type="submit" class="btn btn-sm btn-success">Reactivar</button>
+                                            </form>
+                                            <form th:action="@{/admin/suscripciones/{id}/reintentar(id=${suscripcion.id})}" method="post" class="d-inline form-reintentar-suscripcion"
+                                                  th:data-suscripcion-id="${suscripcion.id}" th:data-usuario="${suscripcion.usuario.username}">
+                                                <input type="hidden" name="estado" th:value="${param.estado != null ? param.estado[0] : ''}" />
+                                                <button type="submit" class="btn btn-sm btn-info">Reintentar Cobro</button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -77,6 +122,74 @@
         </div>
     </div>
     
+    <script th:src="@{/js/utils.js}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cancelar suscripción
+            document.querySelectorAll('.form-cancelar-suscripcion').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const usuario = this.dataset.usuario;
+                    const confirmed = await confirmAction(
+                        `¿Cancelar la suscripción de "${usuario}"?`,
+                        'Sí, cancelar'
+                    );
+                    if (confirmed) {
+                        Spinner.show();
+                        this.submit();
+                    }
+                });
+            });
+            
+            // Eliminar suscripción
+            document.querySelectorAll('.form-eliminar-suscripcion').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const usuario = this.dataset.usuario;
+                    const confirmed = await confirmAction(
+                        `¿Eliminar permanentemente la suscripción de "${usuario}" del historial?`,
+                        'Sí, eliminar'
+                    );
+                    if (confirmed) {
+                        Spinner.show();
+                        this.submit();
+                    }
+                });
+            });
+            
+            // Reactivar suscripción morosa
+            document.querySelectorAll('.form-reactivar-suscripcion').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const usuario = this.dataset.usuario;
+                    const confirmed = await confirmAction(
+                        `¿Reactivar la suscripción de "${usuario}"? (simula que se solucionó el problema de pago)`,
+                        'Sí, reactivar'
+                    );
+                    if (confirmed) {
+                        Spinner.show();
+                        this.submit();
+                    }
+                });
+            });
+            
+            // Reintentar cobro
+            document.querySelectorAll('.form-reintentar-suscripcion').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const usuario = this.dataset.usuario;
+                    const confirmed = await confirmAction(
+                        `¿Reintentar cobro automático para "${usuario}"?`,
+                        'Sí, reintentar'
+                    );
+                    if (confirmed) {
+                        Spinner.show();
+                        this.submit();
+                    }
+                });
+            });
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -108,6 +108,62 @@ public class AdminController {
         return "redirect:/admin";
     }
 
+    // Cancelar suscripción (admin puede cancelar suscripciones activas)
+    
+    @PostMapping("/suscripciones/{id}/cancelar")
+    public String cancelarSuscripcion(@PathVariable Long id, @RequestParam(required = false) String estado, RedirectAttributes redirectAttributes) {
+        try {
+            suscripcionService.cancelarSuscripcion(id);
+            redirectAttributes.addFlashAttribute("mensaje", "Suscripción cancelada exitosamente");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/suscripciones" + (estado != null ? "?estado=" + estado : "");
+    }
+
+    // Eliminar suscripción permanentemente (solo canceladas/morosas)
+    
+    @PostMapping("/suscripciones/{id}/eliminar")
+    public String eliminarSuscripcion(@PathVariable Long id, @RequestParam(required = false) String estado, RedirectAttributes redirectAttributes) {
+        try {
+            suscripcionService.eliminarSuscripcion(id);
+            redirectAttributes.addFlashAttribute("mensaje", "Suscripción eliminada del historial");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/suscripciones" + (estado != null ? "?estado=" + estado : "");
+    }
+
+    // Reactivar suscripción morosa (admin simula que se solucionó el problema de pago)
+    
+    @PostMapping("/suscripciones/{id}/reactivar")
+    public String reactivarSuscripcion(@PathVariable Long id, @RequestParam(required = false) String estado, RedirectAttributes redirectAttributes) {
+        try {
+            suscripcionService.reactivarSuscripcion(id);
+            redirectAttributes.addFlashAttribute("mensaje", "Suscripción reactivada exitosamente");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "success");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/suscripciones" + (estado != null ? "?estado=" + estado : "");
+    }
+
+    // Reintentar renovación de suscripción morosa
+    
+    @PostMapping("/suscripciones/{id}/reintentar")
+    public String reintentarRenovacion(@PathVariable Long id, @RequestParam(required = false) String estado, RedirectAttributes redirectAttributes) {
+        try {
+            suscripcionService.renovarSuscripcion(id);
+            redirectAttributes.addFlashAttribute("mensaje", "Renovación reintentada. Si el cobro fue exitoso, la suscripción está activa.");
+            redirectAttributes.addFlashAttribute("tipoMensaje", "info");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("error", "El reintento falló: " + e.getMessage());
+        }
+        return "redirect:/admin/suscripciones" + (estado != null ? "?estado=" + estado : "");
+    }
+
     // Historial de auditoría (Envers)
     @GetMapping("/auditoria")
     public String verAuditoria(Model model) {

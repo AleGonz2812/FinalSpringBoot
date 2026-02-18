@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planes - SaaS Platform</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/toast.css}" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -120,21 +121,21 @@
                             </div>
                             
                             <!-- Formulario Tarjeta -->
-                            <div th:id="'formTarjeta' + ${plan.id}" style="display:none;">
+                            <div th:id="'formTarjeta' + ${plan.id}" style="display:none;" class="form-tarjeta">
                                 <div class="mb-3">
                                     <label class="form-label">Número de Tarjeta</label>
-                                    <input type="text" class="form-control" name="numeroTarjeta" 
+                                    <input type="text" class="form-control card-number" name="numeroTarjeta" 
                                            placeholder="1234 5678 9012 3456" maxlength="19">
                                 </div>
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">Fecha de Vencimiento</label>
-                                        <input type="text" class="form-control" name="fechaVencimiento" 
+                                        <input type="text" class="form-control expiration-date" name="fechaVencimiento" 
                                                placeholder="MM/AA" maxlength="5">
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label">CVV</label>
-                                        <input type="text" class="form-control" name="cvv" 
+                                        <input type="text" class="form-control card-cvv" name="cvv" 
                                                placeholder="123" maxlength="4">
                                     </div>
                                 </div>
@@ -146,19 +147,19 @@
                             </div>
                             
                             <!-- Formulario PayPal -->
-                            <div th:id="'formPayPal' + ${plan.id}" style="display:none;">
+                            <div th:id="'formPayPal' + ${plan.id}" style="display:none;" class="form-paypal">
                                 <div class="mb-3">
                                     <label class="form-label">Email de PayPal</label>
-                                    <input type="email" class="form-control" name="emailPayPal" 
+                                    <input type="email" class="form-control paypal-email" name="emailPayPal" 
                                            placeholder="tu@email.com">
                                 </div>
                             </div>
                             
                             <!-- Formulario Transferencia -->
-                            <div th:id="'formTransferencia' + ${plan.id}" style="display:none;">
+                            <div th:id="'formTransferencia' + ${plan.id}" style="display:none;" class="form-transferencia">
                                 <div class="mb-3">
                                     <label class="form-label">Número de Cuenta (IBAN)</label>
-                                    <input type="text" class="form-control" name="numeroCuenta" 
+                                    <input type="text" class="form-control iban-input" name="numeroCuenta" 
                                            placeholder="ES1234567890123456789012">
                                 </div>
                                 <div class="mb-3">
@@ -201,6 +202,7 @@
         </div>
     </div>
     
+    <script th:src="@{/js/utils.js}"></script>
     <script>
         function mostrarFormularioPago(select, planId) {
             // Ocultar todos los formularios de este modal
@@ -217,6 +219,136 @@
                 document.getElementById('formTransferencia' + planId).style.display = 'block';
             }
         }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Validaciones para tarjetas
+            document.querySelectorAll('.card-number').forEach(input => {
+                input.addEventListener('input', function() {
+                    formatCreditCard(this);
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (this.value && !Validators.creditCard(this.value)) {
+                        showFieldError(this, 'Número de tarjeta inválido');
+                    } else if (this.value) {
+                        showFieldSuccess(this);
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.expiration-date').forEach(input => {
+                input.addEventListener('input', function() {
+                    formatExpirationDate(this);
+                });
+                
+                input.addEventListener('blur', function() {
+                    if (this.value) {
+                        const result = Validators.expirationDate(this.value);
+                        if (!result.valid) {
+                            showFieldError(this, result.message);
+                        } else {
+                            showFieldSuccess(this);
+                        }
+                    }
+                });
+            });
+            
+            document.querySelectorAll('.card-cvv').forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value && !Validators.cvv(this.value)) {
+                        showFieldError(this, 'CVV inválido (3-4 dígitos)');
+                    } else if (this.value) {
+                        showFieldSuccess(this);
+                    }
+                });
+            });
+            
+            // Validación para PayPal
+            document.querySelectorAll('.paypal-email').forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value && !Validators.email(this.value)) {
+                        showFieldError(this, 'Email inválido');
+                    } else if (this.value) {
+                        showFieldSuccess(this);
+                    }
+                });
+            });
+            
+            // Validación para IBAN
+            document.querySelectorAll('.iban-input').forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value && !Validators.iban(this.value)) {
+                        showFieldError(this, 'IBAN inválido');
+                    } else if (this.value) {
+                        showFieldSuccess(this);
+                    }
+                });
+            });
+            
+            // Validación al enviar formularios
+            document.querySelectorAll('form[action*="/suscripcion/crear"]').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const tipoMetodo = this.querySelector('[name="tipoMetodoPago"]').value;
+                    let valid = true;
+                    
+                    if (tipoMetodo === 'TARJETA') {
+                        const cardNumber = this.querySelector('.card-number');
+                        const expDate = this.querySelector('.expiration-date');
+                        const cvv = this.querySelector('.card-cvv');
+                        
+                        if (!Validators.creditCard(cardNumber.value)) {
+                            showFieldError(cardNumber, 'Número de tarjeta inválido');
+                            valid = false;
+                        }
+                        
+                        const expResult = Validators.expirationDate(expDate.value);
+                        if (!expResult.valid) {
+                            showFieldError(expDate, expResult.message);
+                            valid = false;
+                        }
+                        
+                        if (!Validators.cvv(cvv.value)) {
+                            showFieldError(cvv, 'CVV inválido');
+                            valid = false;
+                        }
+                    } else if (tipoMetodo === 'PAYPAL') {
+                        const email = this.querySelector('.paypal-email');
+                        if (!Validators.email(email.value)) {
+                            showFieldError(email, 'Email inválido');
+                            valid = false;
+                        }
+                    } else if (tipoMetodo === 'TRANSFERENCIA') {
+                        const iban = this.querySelector('.iban-input');
+                        if (!Validators.iban(iban.value)) {
+                            showFieldError(iban, 'IBAN inválido');
+                            valid = false;
+                        }
+                    }
+                    
+                    if (!valid) {
+                        e.preventDefault();
+                        Toast.error('Por favor, corrige los errores en el formulario');
+                    } else {
+                        Spinner.show();
+                    }
+                });
+            });
+            
+            // Confirmación para cambio de plan
+            document.querySelectorAll('form[action*="/suscripcion/cambiar-plan"]').forEach(form => {
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const confirmed = await confirmAction(
+                        '¿Confirmas el cambio de plan? Si es un upgrade, se aplicará un cargo prorrateado.',
+                        'Sí, cambiar plan'
+                    );
+                    if (confirmed) {
+                        Spinner.show();
+                        this.submit();
+                    }
+                });
+            });
+        });
     </script>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
