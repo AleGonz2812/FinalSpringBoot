@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes - SaaS Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">SaaS Platform</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/dashboard}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/dashboard/perfil}">Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/suscripcion/planes}">Planes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/facturas}">Facturas</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" th:href="@{/admin}">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/logout}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Planes Disponibles</h1>
+        
+        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        
+        <div class="row mt-4">
+            <div class="col-md-4" th:each="plan : ${planes}">
+                <div class="card mb-4">
+                    <div class="card-header text-center" 
+                         th:classappend="${plan.nombre.name() == 'BASIC'} ? 'bg-secondary text-white' : 
+                             ${plan.nombre.name() == 'PREMIUM'} ? 'bg-primary text-white' : 'bg-warning'">
+                        <h3 th:text="${plan.nombre}"></h3>
+                    </div>
+                    <div class="card-body text-center">
+                        <h2 class="card-title">
+                            <span th:text="${plan.precio}"></span>€
+                            <small class="text-muted">/mes</small>
+                        </h2>
+                        <p class="card-text" th:text="${plan.descripcion}"></p>
+                        
+                        <div th:if="${suscripcionActual == null}">
+                            <form th:action="@{/suscripcion/crear}" method="post">
+                                <input type="hidden" name="planId" th:value="${plan.id}"/>
+                                <button type="submit" class="btn btn-success w-100">Suscribirse</button>
+                            </form>
+                        </div>
+                        
+                        <div th:if="${suscripcionActual != null}">
+                            <div th:if="${suscripcionActual.plan.id == plan.id}">
+                                <button class="btn btn-secondary w-100" disabled>Plan Actual</button>
+                            </div>
+                            
+                            <div th:unless="${suscripcionActual.plan.id == plan.id}">
+                                <form th:action="@{/suscripcion/cambiar-plan}" method="post" 
+                                      onsubmit="return confirm('¿Confirmas el cambio de plan? Se aplicará prorrateo si corresponde.');">
+                                    <input type="hidden" name="nuevoPlanId" th:value="${plan.id}"/>
+                                    <button type="submit" class="btn btn-primary w-100">Cambiar a este plan</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
