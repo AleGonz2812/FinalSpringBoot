@@ -1,6 +1,7 @@
 package com.example.FinalSpringBoot.service;
 
 import com.example.FinalSpringBoot.enums.EstadoSuscripcion;
+import com.example.FinalSpringBoot.model.MetodoPago;
 import com.example.FinalSpringBoot.model.Plan;
 import com.example.FinalSpringBoot.model.Suscripcion;
 import com.example.FinalSpringBoot.model.Usuario;
@@ -27,6 +28,7 @@ public class SuscripcionService {
         return suscripcionRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Optional<Suscripcion> obtenerSuscripcionPorId(Long id) {
         return suscripcionRepository.findById(id);
     }
@@ -55,6 +57,29 @@ public class SuscripcionService {
         Suscripcion suscripcion = new Suscripcion();
         suscripcion.setUsuario(usuario);
         suscripcion.setPlan(plan);
+        suscripcion.setFechaInicio(LocalDateTime.now());
+        suscripcion.setFechaFin(LocalDateTime.now().plusDays(30)); // 30 días de suscripción
+        suscripcion.setEstado(EstadoSuscripcion.ACTIVA);
+
+        suscripcion = suscripcionRepository.save(suscripcion);
+
+        facturaService.generarFactura(suscripcion, plan.getPrecio());
+
+        return suscripcion;
+    }
+
+    
+    @Transactional
+    public Suscripcion crearSuscripcionConMetodoPago(Usuario usuario, Plan plan, MetodoPago metodoPago) {
+        Optional<Suscripcion> suscripcionActiva = obtenerSuscripcionActiva(usuario.getId());
+        if (suscripcionActiva.isPresent()) {
+            throw new RuntimeException("El usuario ya tiene una suscripción activa");
+        }
+
+        Suscripcion suscripcion = new Suscripcion();
+        suscripcion.setUsuario(usuario);
+        suscripcion.setPlan(plan);
+        suscripcion.setMetodoPago(metodoPago);
         suscripcion.setFechaInicio(LocalDateTime.now());
         suscripcion.setFechaFin(LocalDateTime.now().plusDays(30)); // 30 días de suscripción
         suscripcion.setEstado(EstadoSuscripcion.ACTIVA);
@@ -115,6 +140,7 @@ public class SuscripcionService {
 
     
     @Transactional
+    @SuppressWarnings("null")
     public Suscripcion renovarSuscripcion(Long suscripcionId) {
         Suscripcion suscripcion = suscripcionRepository.findById(suscripcionId)
                 .orElseThrow(() -> new RuntimeException("Suscripción no encontrada"));
@@ -139,6 +165,7 @@ public class SuscripcionService {
 
     
     @Transactional
+    @SuppressWarnings("null")
     public Suscripcion cancelarSuscripcion(Long suscripcionId) {
         Suscripcion suscripcion = suscripcionRepository.findById(suscripcionId)
                 .orElseThrow(() -> new RuntimeException("Suscripción no encontrada"));
@@ -149,6 +176,7 @@ public class SuscripcionService {
 
    
     @Transactional
+    @SuppressWarnings("null")
     public Suscripcion marcarComoMorosa(Long suscripcionId) {
         Suscripcion suscripcion = suscripcionRepository.findById(suscripcionId)
                 .orElseThrow(() -> new RuntimeException("Suscripción no encontrada"));

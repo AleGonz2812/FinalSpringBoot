@@ -23,6 +23,7 @@ public class FacturaService {
         return facturaRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Optional<Factura> obtenerFacturaPorId(Long id) {
         return facturaRepository.findById(id);
     }
@@ -86,6 +87,7 @@ public class FacturaService {
 
    
     @Transactional
+    @SuppressWarnings("null")
     public void eliminarFactura(Long facturaId) {
         facturaRepository.deleteById(facturaId);
     }

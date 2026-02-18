@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.RelationTargetAuditMode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,6 +44,11 @@ public class Suscripcion {
     @ManyToOne
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
+
+    @ManyToOne
+    @JoinColumn(name = "metodo_pago_id")
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+    private MetodoPago metodoPago;
 
     @OneToMany(mappedBy = "suscripcion", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Factura> facturas = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.example.FinalSpringBoot.config;
 
+import com.example.FinalSpringBoot.security.CustomAuthenticationSuccessHandler;
 import com.example.FinalSpringBoot.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +21,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final CustomAuthenticationSuccessHandler authenticationSuccessHandler;
 
     
     @Bean
@@ -36,7 +38,7 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")                    
                 .loginProcessingUrl("/login")           
-                .defaultSuccessUrl("/dashboard", true)  
+                .successHandler(authenticationSuccessHandler)
                 .failureUrl("/login?error=true")        
                 .permitAll()
             )

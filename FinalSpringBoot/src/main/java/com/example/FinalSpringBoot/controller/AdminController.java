@@ -49,7 +49,7 @@ public class AdminController {
         model.addAttribute("suscripciones", suscripcionService.obtenerSuscripcionesPorUsuario(id));
         model.addAttribute("facturas", facturaService.obtenerFacturasPorUsuario(id));
         
-        return "admin/detalle-usuario";
+        return "admin/usuario-detalle";
     }
 
     // Ver todas las suscripciones

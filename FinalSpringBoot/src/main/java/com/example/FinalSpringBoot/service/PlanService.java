@@ -21,6 +21,7 @@ public class PlanService {
         return planRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Optional<Plan> obtenerPlanPorId(Long id) {
         return planRepository.findById(id);
     }
@@ -29,8 +30,7 @@ public class PlanService {
         return planRepository.findByNombre(tipo);
     }
 
-    @Transactional
-    public Plan guardarPlan(Plan plan) {
+    @Transactional    @SuppressWarnings("null")    public Plan guardarPlan(Plan plan) {
         return planRepository.save(plan);
     }
 

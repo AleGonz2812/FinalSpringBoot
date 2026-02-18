@@ -19,18 +19,6 @@
                         <a class="nav-link" th:href="@{/admin}">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/usuarios}">Usuarios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" th:href="@{/admin/suscripciones}">Suscripciones</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/admin/facturas}">Facturas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/dashboard}">Volver a Usuario</a>
-                    </li>
-                    <li class="nav-item">
                         <form th:action="@{/logout}" method="post" class="d-inline">
                             <button type="submit" class="btn btn-link nav-link">Cerrar Sesión</button>
                         </form>
@@ -41,7 +29,10 @@
     </nav>
 
     <div class="container-fluid mt-4">
-        <h1>Gestión de Suscripciones</h1>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1>Gestión de Suscripciones</h1>
+            <a th:href="@{/admin}" class="btn btn-primary">← Volver al Panel</a>
+        </div>
         
         <div class="card mt-4">
             <div class="card-body">
@@ -68,13 +59,12 @@
                                     <td th:text="${suscripcion.plan.precio} + '€'"></td>
                                     <td>
                                         <span class="badge" 
-                                              th:classappend="${suscripcion.estado.name() == 'ACTIVA'} ? 'bg-success' : 
-                                                  ${suscripcion.estado.name() == 'CANCELADA'} ? 'bg-secondary' : 'bg-danger'" 
+                                              th:classappend="${suscripcion.estado.name() == 'ACTIVA' ? 'bg-success' : (suscripcion.estado.name() == 'CANCELADA' ? 'bg-secondary' : 'bg-danger')}" 
                                               th:text="${suscripcion.estado}"></span>
                                     </td>
                                     <td th:text="${#temporals.format(suscripcion.fechaInicio, 'dd/MM/yyyy')}"></td>
                                     <td th:text="${#temporals.format(suscripcion.fechaFin, 'dd/MM/yyyy')}"></td>
-                                    <td th:text="${suscripcion.usuario.perfil.pais}"></td>
+                                    <td th:text="${suscripcion.usuario.perfil != null ? suscripcion.usuario.perfil.pais : '-'}"></td>
                                 </tr>
                             </tbody>
                         </table>

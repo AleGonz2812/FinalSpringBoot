@@ -25,6 +25,7 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
+    @SuppressWarnings("null")
     public Optional<Usuario> obtenerUsuarioPorId(Long id) {
         return usuarioRepository.findById(id);
     }
@@ -80,6 +81,7 @@ public class UsuarioService {
 
     
     @Transactional
+    @SuppressWarnings("null")
     public Perfil actualizarPerfil(Long usuarioId, String nombre, String apellido, String pais) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -98,6 +100,7 @@ public class UsuarioService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public void eliminarUsuario(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -106,6 +109,7 @@ public class UsuarioService {
 
     
     @Transactional
+    @SuppressWarnings("null")
     public void cambiarPassword(Long usuarioId, String nuevaPassword) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
