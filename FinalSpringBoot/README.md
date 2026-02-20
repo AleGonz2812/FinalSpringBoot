@@ -120,7 +120,7 @@ FinalSpringBoot/
 - [x] Panel de Administración (Dashboard, Usuarios, Facturas, Auditoría)
 - [x] Vista de Facturación con impuestos
 
-### 🔄 Semana 3 - Pruebas y Documentación
+### ✅ Semana 3 - Pruebas y Documentación
 - [x] Pruebas unitarias con JUnit (72 tests pasando)
 - [x] Diagrama E-R normalizado (docs/diagrama-er.png)
 - [x] Tabla de pruebas realizadas (TESTING.md)
@@ -556,23 +556,6 @@ Sistema de notificaciones elegantes que reemplazan los `alert()` nativos:
 - Cancelación de suscripción con advertencia clara
 - Cambio de plan con información de prorrateo
 
-### 📁 Archivos Implementados
-
-- `src/main/resources/static/css/toast.css` - Estilos para notificaciones y validaciones
-- `src/main/resources/static/js/utils.js` - Funciones de validación, toast y spinner
-
-Ver documentación completa en: [MEJORAS-UX.md](MEJORAS-UX.md)
-
----
-
-## 🚧 Tareas Pendientes (Semana 3)
-
-1. ~~Implementar pruebas JUnit~~ ✅ **COMPLETADO** (72 tests)
-2. ~~Crear diagrama E-R~~ ✅ **COMPLETADO** (ver docs/diagrama-er.png)
-3. ~~Documentar casos de prueba~~ ✅ **COMPLETADO** (TESTING.md)
-4. ~~Mejorar UX/UI~~ ✅ **COMPLETADO** (validaciones + toast + spinners)
-5. ~~README completo~~ ✅ **COMPLETADO** (con datos de prueba)
-6. **Commit y push final a GitHub** ⏳ PENDIENTE
 
 ---
 
@@ -583,12 +566,3 @@ Alejandro González
 - Email: agonvel.1307@gmail.com
 
 ---
-
-## 📄 Licencia
-
-Este proyecto es parte de un ejercicio académico - ILERNA 2º AÑO
-
----
-
-**Fecha de entrega**: 20 de febrero de 2026  
-**Estado**: ✅ Semana 1, 2 y 3 completadas | 🚀 Listo para entrega
